@@ -67,32 +67,20 @@ FETCH FIRST 1 ROW ONLY;
 ```
 
 > 11. Zaznacz prawidłowe odpowiedzi dotyczące polecenia RENAME
-
- - [X] a. Jest to polecenie z grupy DDL
-
- - [X] b. Nie można go cofnąć poleceniem ROLLBACK
-
- - [ ] c. Aby zatwierdzić wprowadzone przez niego zmiany należy wykonać COMMIT
-
- - [ ] d. Jest to polecenie z grupy DML
+> - [X] a. Jest to polecenie z grupy DDL
+> - [X] b. Nie można go cofnąć poleceniem ROLLBACK
+> - [ ] c. Aby zatwierdzić wprowadzone przez niego zmiany należy wykonać COMMIT
+> - [ ] d. Jest to polecenie z grupy DML
 
 > 12. Polecenia modyfikujące dane w tabelach bazy danych to polecenia:
-
- - [X] a. DML
-
- - [ ] b. DQL
-
- - [ ] c. TCL
-
- - [ ] d. DDL
-
- - [ ] e. DCL
+> - [X] a. DML
+> - [ ] b. DQL
+> - [ ] c. TCL
+> - [ ] d. DDL
+> - [ ] e. DCL
 
 > 13. W bazie danych jest tabela animals. Chcąc zmienić nazwę tabeli na pets możesz użyć polecenia:
- - [ ] a. ALTER TABLE animals TO pets;
-
- - [X] b. RENAME animals TO pets;
-
- - [ ] c. RENAME animals pets;
-
- - [ ] d. ALTER animals TO pets;
+> - [ ] a. ALTER TABLE animals TO pets;
+> - [X] b. RENAME animals TO pets;
+> - [ ] c. RENAME animals pets;
+> - [ ] d. ALTER animals TO pets;
