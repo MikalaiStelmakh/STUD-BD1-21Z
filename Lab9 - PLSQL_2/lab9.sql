@@ -33,6 +33,7 @@ as
         END IF;
         RETURN v_bonus;
     END;
+
     function create_login(emp_id number)
     return varchar2
     as
@@ -45,7 +46,7 @@ as
         select name, surname
         into v_emp_name, v_emp_surname
         from employees where employee_id = emp_id;
-    
+
         if length(v_emp_surname) > c_max_surname_chars then
             v_surname_as_login := substr(v_emp_surname, 1, c_max_surname_chars);
         else
@@ -87,7 +88,7 @@ begin
     select avg(salary)
     into v_avg_salary
     from employees;
-    
+
     dbms_output.put_line('?rednie zarobki: ' || v_avg_salary);
 end;
 /
@@ -104,10 +105,10 @@ when (new.department_id is not null and new.manager_id is null)
 declare
     v_new_manager_id number;
 begin
-    select manager_id 
+    select manager_id
     into v_new_manager_id
     from departments where department_id = :new.department_id;
-    
+
     :new.manager_id := v_new_manager_id;
 end;
 /
@@ -122,10 +123,10 @@ declare
     v_new_manager_id number;
 begin
     if (:new.department_id is not null and :new.manager_id is null) then
-            select manager_id 
+            select manager_id
             into v_new_manager_id
             from departments where department_id = :new.department_id;
-            
+
             :new.manager_id := v_new_manager_id;
     end if;
 end;
@@ -142,11 +143,11 @@ before insert or update of position_id on employees
 declare
     v_num_of_directors number;
 begin
-    select count(e.employee_id) 
+    select count(e.employee_id)
     into v_num_of_directors
     from employees e join positions p using(position_id)
     where p.name = 'Prezes';
-    
+
     if v_num_of_directors >= 1 then
             raise_application_error(-20001, 'Wieciej niz jeden prezes');
     end if;
@@ -164,8 +165,8 @@ alter trigger tg_pos_director ENABLE;
 --------------------------------------------------------------------------------
 --PRZYKLAD KURSOR NIEJAWNYY
 BEGIN
-FOR r_emp IN (SELECT e.name as name, surname, p.name as position, 
-              d.name as department FROM employees e 
+FOR r_emp IN (SELECT e.name as name, surname, p.name as position,
+              d.name as department FROM employees e
               JOIN positions p USING (position_id) JOIN departments d USING (department_id))
 LOOP
    dbms_output.put_line('Dane prac.: ' || r_emp.name || ' ' || r_emp.surname || ' ' || r_emp.position || ' ' || r_emp.department);
@@ -177,9 +178,9 @@ DECLARE
     CURSOR cr IS
         SELECT * FROM employees;
     v_rec_employees employees%ROWTYPE;
-BEGIN  
-    OPEN cr;  
-    LOOP    
+BEGIN
+    OPEN cr;
+    LOOP
         EXIT WHEN cr%NOTFOUND;
         FETCH cr INTO v_rec_employees;
         dbms_output.put_line('Podstawowe dane pracownika: ' ||  v_rec_employees.name || ' ' ||
@@ -223,8 +224,8 @@ exec emp_info;
 --2
 create or replace procedure dept_info(p_no_dept number)
 as
-    cursor cr_dept is select * from departments 
-                      order by year_budget desc 
+    cursor cr_dept is select * from departments
+                      order by year_budget desc
                       fetch first p_no_dept rows with ties;
     v_department    departments%rowtype;
     v_manager employees%rowtype;
@@ -236,7 +237,7 @@ begin
         dbms_output.put_line('Department id: ' || v_department.department_id);
         select * into v_manager
         from employees where employee_id = v_department.manager_id;
-        
+
         dbms_output.put_line(v_manager.name);
         dbms_output.put_line('-------------------------------');
 

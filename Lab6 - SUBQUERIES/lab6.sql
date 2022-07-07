@@ -143,12 +143,45 @@ WHERE NOT EXISTS (
 
 --podzapytania w SELECT/FROM
 --1
-SELECT name, surname, salary,
-    ABS(ROUND(
-    salary - (SELECT AVG(salary) FROM employees e2 WHERE e2.department_id = e1.department_id)
-    )) as diff
-FROM employees e1
-WHERE salary IS NOT NULL;
+SELECT e.name, e.surname, e.salary, ABS(e.salary - (SELECT ROUND(AVG(salary)) sal FROM employees))
+FROM employees e
+WHERE e.salary IS NOT NULL;
+
+--2
+SELECT e.name, e.surname, e.salary, e.gender, ABS(e.salary - a.sal) diff
+FROM employees e, (SELECT ROUND(AVG(salary)) sal FROM employees WHERE gender = 'K') a
+WHERE e.salary IS NOT NULL AND e.gender = 'K' AND ABS(e.salary - a.sal) > 1000;
+
+--3
+SELECT COUNT(*) FROM (
+    SELECT e.name, e.surname, e.salary, e.gender, ABS(e.salary - a.sal) diff
+    FROM employees e, (SELECT ROUND(AVG(salary)) sal FROM employees WHERE gender = 'K') a
+    WHERE e.salary IS NOT NULL AND e.gender = 'K' AND ABS(e.salary - a.sal) > 1000
+);
+
+--4
+SELECT *
+FROM employees, (SELECT MAX(date_end) date_end FROM projects)
+WHERE date_employed > date_end;
+
+--5
+SELECT e.employee_id, e.name, e.surname, AVG(g.grade), department_avg
+FROM employees e
+    LEFT JOIN emp_grades eg ON e.employee_id = eg.employee_id
+    LEFT JOIN grades g ON g.grade_id = eg.grade_id
+    JOIN (
+        SELECT e2.department_id, AVG(g2.grade) department_avg
+        FROM departments d
+            JOIN employees e2 ON d.department_id = e2.department_id
+            JOIN emp_grades eg2 ON eg2.employee_id = e2.employee_id
+            JOIN grades g2 ON g2.grade_id = eg2.grade_id
+        WHERE EXTRACT(YEAR FROM eg2.inspection_date) = 2019
+        GROUP BY e2.department_id
+    ) USING (department_id)
+WHERE EXTRACT(YEAR FROM eg.inspection_date) = 2019
+GROUP BY e.employee_id, e.name, e.surname, department_avg
+HAVING AVG(g.grade) > department_avg;
+
 
 
 

@@ -158,21 +158,49 @@ WHERE NOT EXISTS (
 ## Podzapytania w SELECT/FROM
 > Napisz zapytanie, które dla wszystkich pracowników posiadających pensję zwróci informację o różnicy między ich pensją, a średnią pensją pracowników. Różnicę podaj jako zaokrągloną wartość bezwzględną.
 ```sql
+SELECT e.name, e.surname, e.salary, ABS(e.salary - (SELECT ROUND(AVG(salary)) sal FROM employees))
+FROM employees e
+WHERE e.salary IS NOT NULL;
 
 ```
 > Korzystając z poprzedniego rozwiązania, napisz zapytanie, które zwróci tylko tych pracowników, którzy są kobietami i dla których różnica do wartości średniej jest powyżej 1000.
 ```sql
+SELECT e.name, e.surname, e.salary, e.gender, ABS(e.salary - a.sal) diff
+FROM employees e, (SELECT ROUND(AVG(salary)) sal FROM employees WHERE gender = 'K') a
+WHERE e.salary IS NOT NULL AND e.gender = 'K' AND ABS(e.salary - a.sal) > 1000;
 
 ```
 > Zmodyfikuj poprzednie zapytanie tak aby obliczyć liczbe pracowników. (skorzystaj z podzapytania)
 ```sql
-
+SELECT COUNT(*) FROM (
+    SELECT e.name, e.surname, e.salary, e.gender, ABS(e.salary - a.sal) diff
+    FROM employees e, (SELECT ROUND(AVG(salary)) sal FROM employees WHERE gender = 'K') a
+    WHERE e.salary IS NOT NULL AND e.gender = 'K' AND ABS(e.salary - a.sal) > 1000
+);
 ```
 > Napisz zapytanie które zwróci informacje o pracownikach zatrudnionych po zakończeniu wszystkich projektów (tabela projects). W wynikach zapytania umieść jako kolumnę datę graniczną.
 ```sql
-
+SELECT *
+FROM employees, (SELECT MAX(date_end) date_end FROM projects)
+WHERE date_employed > date_end;
 ```
 > Napisz zapytanie które zwróci pracowników którzy uzyskali w 2019 oceny wyższe niż średnia w swoim departamencie. Pokaż średnią departamentu jako kolumnę.
 ```sql
+SELECT e.employee_id, e.name, e.surname, AVG(g.grade), department_avg
+FROM employees e
+    LEFT JOIN emp_grades eg ON e.employee_id = eg.employee_id
+    LEFT JOIN grades g ON g.grade_id = eg.grade_id
+    JOIN (
+        SELECT e2.department_id, AVG(g2.grade) department_avg
+        FROM departments d
+            JOIN employees e2 ON d.department_id = e2.department_id
+            JOIN emp_grades eg2 ON eg2.employee_id = e2.employee_id
+            JOIN grades g2 ON g2.grade_id = eg2.grade_id
+        WHERE EXTRACT(YEAR FROM eg2.inspection_date) = 2019
+        GROUP BY e2.department_id
+    ) USING (department_id)
+WHERE EXTRACT(YEAR FROM eg.inspection_date) = 2019
+GROUP BY e.employee_id, e.name, e.surname, department_avg
+HAVING AVG(g.grade) > department_avg;
 
 ```
